@@ -89,7 +89,7 @@ test$Tribe <- as.factor(test$Tribe)
 # In numerosi casi il valore inserito è 0, questo perché in casi di anziani nelle
 # intersezioni di suture avviene la sinostosi: le suture si fondono completamente e
 # l osso diventa liscio. I crani sono stati misurati su cadaveri quindi per forza una
-# gran parte proviene da anziani questo spiega la possibile difficloltà nel misurarlo.
+# gran parte proviene da anziani questo spiega la possibile difficoltà nel misurarlo.
 training <- training %>% select(-c("RFA", "RPA", "ROA", "BSA", "SBA", "SLA", "TBA", "LAR", "OSR", "BAR", "BRR"))
 test <- test %>% select(-c("RFA", "RPA", "ROA", "BSA", "SBA", "SLA", "LAR", "OSR", "BAR", "BRR", "TBA"))
 
@@ -464,7 +464,7 @@ adjustedRandIndex(training.kmeans$cluster , labels[ ,1])
 # Import ------------------------------------------------------------------
 
 rm(list = ls())
-
+setwd("C:\\Users\\delfi\\OneDrive\\Documents\\Università\\Terzo anno\\Statistica Computazionale\\Lavoro di Gruppo\\Pedol, Colapinto, Quadrelli 3")
 test <- read.csv("Howell-test1.csv", header = TRUE, sep= ";")
 training <- read.csv("Howell-training.csv", header = TRUE, sep = ",")
 
@@ -530,7 +530,6 @@ sort(abs(loadings(pca)[,1]), decreasing = TRUE)
 top_features <- c("NAR", "BNL", "ZOR", "GOL", "NOL", "PRR", "JUB", "ZYB", "SSR", "DKR")
 
 data_ridotto <- data_centered %>% select(all_of(top_features))
-pairs(data_ridotto[1:5], col=data_ridotto$class)
 
 mclust_ottimizzato <- Mclust(data_ridotto)
 summary(mclust_ottimizzato)
@@ -616,10 +615,12 @@ top_features <- c("MAB", "FRC", "AUB", "GOL", "NOL", "AVR", "JUB", "ZYB", "NPH",
 data_ridotto <- data_centered %>% select(all_of(top_features))
 pairs(data_ridotto, col = training$Sex)
 ggpairs(data_ridotto)
+
 set.seed(778)
 mclust_ottimizzato <- Mclust(data_ridotto)
 summary(mclust_ottimizzato)
 classError(mclust_ottimizzato$classification, training$Sex)$errorRate
+
 # 00.1295563
 # abbiamo abbassato leggermente l'errore e questa volta non dobbiamo più imporre due gruppi
 
@@ -637,10 +638,16 @@ mean(error)
 
 class <- as.factor(mclust_ottimizzato$classification)
 levels(class) <- c('M','F')
+class <- factor(class, levels = rev(levels(class)))
+training$Sex
+
 M <- confusionMatrix(class, training$Sex)
-Incertezza<- unname(1- M$overall['Accuracy'])
+M
+
+Incertezza <- unname(1- M$overall['Accuracy'])
+
 # Accuracy : 0.8704
-#Incertezza:0.1295563
+# Incertezza :0.1295563
 adjustedRandIndex(mclust_ottimizzato$classification, training$Sex) # 0.5486889
 
 mu <- mclust_ottimizzato$parameters$mean          
@@ -651,11 +658,15 @@ S1 <- Sigma[,,1]
 S2 <- Sigma[,,2]
 invS1 <- solve(S1)
 invS2 <- solve(S2)
-diff_mu <- mu[,1] - mu[,2]
+diff_mu <- matrix(mu[,1] - mu[,2], ncol=1)
 d <- length(top_features) 
 
-KL_d <- 0.5 * (t(diff_mu) %% (invS1 + invS2) %% diff_mu) + 
-  0.5 * sum(diag(invS2 %% S1 + invS1 %% S2)) - d
+dim(diff_mu)
+dim(invS1)
+dim(invS2)
+
+KL_d <- 0.5 * (t(diff_mu) %*% (invS1 + invS2) %*% diff_mu) + 
+  0.5 * sum(diag(invS2 %*% S1 + invS1 %*% S2)) - d
 
 mu_true <- p[1] * mu[,1] + p[2] * mu[,2]
 
@@ -682,12 +693,18 @@ print(output)
 
 test_ottimo <- data_centeredd %>%
   select(all_of(top_features))
+
 summary(test_ottimo)
+
 p <- predict(mclust_ottimizzato, test_ottimo)
+p$classification
+data_centeredd$Sex
 
 levels(data_centeredd$Sex) <- c(2,1)
 
-sum(as.factor(p$classification)==as.factor(data_centeredd$Sex))
+sum(as.factor(p$classification)==as.factor(data_centeredd$Sex)) # 276
 
 confusionMatrix(as.factor(p$classification), as.factor(data_centeredd$Sex)) 
-adjustedRandIndex (p$classification,data_centeredd$Sex)
+# Accuracy: 0.8263
+
+adjustedRandIndex(p$classification,data_centeredd$Sex)
