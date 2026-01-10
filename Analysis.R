@@ -1,6 +1,6 @@
-###################################################
-# TRAINING SET: V-FOLDS CROSS VALIDATION
-###################################################
+###################
+# Cranialclusters #
+###################
 
 # setwd("/path/to/your/directory")
 test <- read.csv("Howell-test1.csv", header = TRUE, sep= ";")
