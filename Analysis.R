@@ -464,7 +464,7 @@ adjustedRandIndex(training.kmeans$cluster , labels[ ,1])
 # Import ------------------------------------------------------------------
 
 rm(list = ls())
-setwd("C:\\Users\\delfi\\OneDrive\\Documents\\Università\\Terzo anno\\Statistica Computazionale\\Lavoro di Gruppo\\Pedol, Colapinto, Quadrelli 3")
+
 test <- read.csv("Howell-test1.csv", header = TRUE, sep= ";")
 training <- read.csv("Howell-training.csv", header = TRUE, sep = ",")
 
