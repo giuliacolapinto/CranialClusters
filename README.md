@@ -1,3 +1,61 @@
+# Cranometric Analysis Project
+
+The goal of the script is to compare different supervised clustering and classification methodologies for distinguishing male and female samples in the Howell dataset.
+
+## Pre-processing and Cleaning Treatment
+
+**Synostosis**: Exclusion of 11 qualitative variables (e.g. RFA, RPA, BSA) due to null values ​​resulting from bone fusion in elderly subjects.
+
+**Standardization**: Centering and scaling of data grouped by population/tribe to remove geographic bias.
+
+**Feature Selection**: Using PCA to identify variables with the highest loadings (e.g., NAR, GOL, ZYB).
+
+## Tested Models
+
+### A. Gaussian Mixture Models (V-Fold Cross Validation)
+
+#### A.1. V-Fold CV with 18 Original Variables
+
+In this phase, iterative tests (100 simulations for each V block) were conducted using the `Rmixmod` package on the selected variables (e.g. `NAR`, `GOL`, `ZYB`, `BNL`).
+
+-   **Configurations Tested:** Cross-validation blocks with $V = 5, 8, 10, 12, 15$ were evaluated.
+
+-   **Best Model by Error (CV):** The **`Gaussian_pk_L_C`** model (constant volume, equal shape, free orientation) consistently minimized the cross-validation error, with a value of approximately **0.122**.
+
+-   **Best Model for Accuracy:** The **`Gaussian_pk_Lk_C`** (variable volume) model instead maximized predictive accuracy on the test set, reaching peaks of **82.6%**.
+
+-   **Partial Conclusion:** Despite the variations in $V$, the results remained stable, indicating that a variable volume structure better describes the distribution of the original data.
+
+#### A.2. V-Fold CV with PCA (Reduced Size)
+
+The analysis was repeated using only the first two principal components (PC1 and PC2) to test whether noise reduction improved classification.
+
+-   **Configurations Tested:** Blocks of $V = 10, 20, 60, 100$.
+
+-   **Best Model for Error (CV):** The **EVE** (`Gaussian_pk_L_D_Ak_D`) and **EEV** models were found to be the most balanced. The CV value obtained was approximately **0.145-0.146**, slightly higher (and therefore worse) than the raw variables.
+
+-   **Best Model for Accuracy:** Even with PCA, the maximum accuracy was around **81-82%**.
+
+-   **Visualization:** An analysis of the misclassifications was produced via scatter plot, highlighting how the errors (black dots) are concentrated in the overlapping areas of the confidence ellipses between the two sexes.
+
+### B. Clustering K-means
+
+Tested as an unsupervised approach with K=2.
+
+**Result:** Unsatisfactory, with an error rate of **21.3%** and a low Adjusted Rand Index (ARI) (0.32).
+
+### C. Optimized Mclust Models
+
+An iterative search (200 simulations) was performed to find the optimal subset of 10 variables and the best probabilistic model:
+
+-   **Final feature:** `MAB`, `FRC`, `AUB`, `GOL`, `NOL`, `AVR`, `JUB`, `ZYB`, `NPH`, `FMB`.
+
+-   **Model:** **VVE** (Variable Volume, Equal Shape, Equal Orientation).
+
+-   **Performance:** Accuracy on the test set of **83%**.
+
+# ITALIAN VERSION:
+
 # Progetto di Analisi Cranometrica
 
 L'obiettivo dello script è confrontare diverse metodologie di clustering e classificazione supervisionata per distinguere i campioni maschili e femminili nel dataset Howell.
